@@ -92,6 +92,40 @@ router.post("/login", async (req, res) => {
     res.status(400).send(e.message);
   }
 });
-router.post("/forgetpassword", (req, res) => {});
+router.post("/changepassword", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (email === undefined) throw new Error("email is missing");
+    const { oldPassword } = req.body;
+    if (oldPassword === undefined) throw new Error("old password is missing");
+    //?check if the old password is correct
+    const { newPassword } = req.body;
+    if (newPassword === undefined) throw new Error("new password is missing");
+    // console.log(
+    //   "🚀 ~ file: auth.js:113 ~ router.post ~ newPassword",
+    //   newPassword
+    // );
+    const user = await User.findOne({ email: email });
+    // console.log("🚀 ~ file: auth.js:103 ~ router.post ~ user", user);
+    if (!user) throw new Error(JSON.stringify({ message: "user not found" }));
+    const isPasswordCorrect = await bycrypt.compare(oldPassword, user.password);
+    // console.log(
+    //   "🚀 ~ file: auth.js:103 ~ router.post ~ isPasswordCorrect",
+    //   isPasswordCorrect
+    // );
+    if (!isPasswordCorrect)
+      throw new Error(JSON.stringify({ message: "old password is incorrect" }));
+    //?hasing the password
+
+    const salt = await bycrypt.genSalt();
+    const hashedPassword = await bycrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    await user.save();
+    res.status(200).send({ status: "ok" });
+  } catch (e) {
+    res.status(400).send(e.message);
+  }
+});
 
 export default router;

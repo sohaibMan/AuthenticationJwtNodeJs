@@ -10,7 +10,7 @@ function auth(req, res, next) {
     const token = req.headers["auth-token"];
     if (!token) throw new Error(JSON.stringify({ message: "access denied" }));
     const user = jwt.verify(token, process.env.TOKEN_SECRET);
-    console.log("🚀 ~ file: posts.js:13 ~ auth ~ user", user);
+    console.log("🚀 ~ file: posts.js:13 ~ auth ~ user", Date.now() > user.exp);
     if (Date.now() > user.exp)
       throw new Error(
         JSON.stringify({ message: "access denied-token exipred" })

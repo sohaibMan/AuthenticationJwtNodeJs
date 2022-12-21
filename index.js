@@ -18,5 +18,5 @@ app.use(json());
 
 app.listen(process.env.PORT || 3000);
 
-app.use("/api/v1/user", authRoute);
+app.use("/api/v1/users", authRoute);
 app.use("/api/v1/posts", postsRoute);
